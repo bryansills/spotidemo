@@ -1,2 +1,7 @@
+STORE_FILE=<snip_no_quotation_marks>
+STORE_PASSWORD=<snip_no_quotation_marks>
+KEY_ALIAS=<snip_no_quotation_marks>
+KEY_PASSWORD=<snip_no_quotation_marks>
+
 SPOTIFY_CLIENT_ID="<snip>"
 SPOTIFY_REDIRECT_URI="<snip>"
