@@ -1,5 +1,6 @@
 package ninja.bryansills.spotidemo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,16 +24,16 @@ public class MainActivity extends AppCompatActivity implements
     
     private static final String TAG = MainActivity.class.getName();
 
-    // TODO: Replace with your client ID
     private static final String CLIENT_ID = BuildConfig.SPOTIFY_CLIENT_ID;
-    // TODO: Replace with your redirect URI
-    private static final String REDIRECT_URI = BuildConfig.SPOTIFY_REDIRECT_URI;
-
-    // Request code that will be passed together with authentication result to the onAuthenticationResult callback
-    // Can be any integer
-    private static final int REQUEST_CODE = 1337;
+    private static final String EXTRA_ACCESS_TOKEN = "EXTRA_ACCESS_TOKEN";
 
     private Player mPlayer;
+
+    public static Intent newIntent(Context context, String accessToken) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(EXTRA_ACCESS_TOKEN, accessToken);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,38 +42,22 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        AuthenticationRequest.Builder builder =
-                new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
-        AuthenticationRequest request = builder.build();
+        String token = getIntent().getStringExtra(EXTRA_ACCESS_TOKEN);
 
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        // Check if result comes from the correct activity
-        if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-                    @Override
-                    public void onInitialized(Player player) {
-                        mPlayer.addConnectionStateCallback(MainActivity.this);
-                        mPlayer.addPlayerNotificationCallback(MainActivity.this);
-                        mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e(TAG, "Could not initialize player: " + throwable.getMessage());
-                    }
-                });
+        Config playerConfig = new Config(this, token, CLIENT_ID);
+        mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
+            @Override
+            public void onInitialized(Player player) {
+                mPlayer.addConnectionStateCallback(MainActivity.this);
+                mPlayer.addPlayerNotificationCallback(MainActivity.this);
+                mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
             }
-        }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e(TAG, "Could not initialize player: " + throwable.getMessage());
+            }
+        });
     }
 
     @Override
