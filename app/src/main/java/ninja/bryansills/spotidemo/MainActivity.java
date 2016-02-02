@@ -19,6 +19,14 @@ import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
 
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyCallback;
+import kaaes.spotify.webapi.android.SpotifyError;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Album;
+import kaaes.spotify.webapi.android.models.TrackSimple;
+import retrofit.client.Response;
+
 public class MainActivity extends AppCompatActivity implements
         PlayerNotificationCallback, ConnectionStateCallback {
     
@@ -27,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String CLIENT_ID = BuildConfig.SPOTIFY_CLIENT_ID;
     private static final String EXTRA_ACCESS_TOKEN = "EXTRA_ACCESS_TOKEN";
 
+    private SpotifyApi spotifyApi;
     private Player mPlayer;
 
     public static Intent newIntent(Context context, String accessToken) {
@@ -43,6 +52,23 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         String token = getIntent().getStringExtra(EXTRA_ACCESS_TOKEN);
+        spotifyApi = new SpotifyApi();
+        spotifyApi.setAccessToken(token);
+        SpotifyService spotifyService = spotifyApi.getService();
+
+        spotifyService.getAlbum("4wJ585ippGitIpRcGs1GD7", new SpotifyCallback<Album>() {
+            @Override
+            public void failure(SpotifyError spotifyError) {
+                Log.d("BLARG", spotifyError.toString());
+            }
+
+            @Override
+            public void success(Album album, Response response) {
+                for (TrackSimple track : album.tracks.items) {
+                    Log.d("BLARG", "Title: " + track.name + " URI: " + track.uri);
+                }
+            }
+        });
 
         Config playerConfig = new Config(this, token, CLIENT_ID);
         mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
