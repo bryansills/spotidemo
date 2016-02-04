@@ -4,20 +4,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.spotify.sdk.android.authentication.AuthenticationRequest;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyCallback;
@@ -38,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements
     private SpotifyApi spotifyApi;
     private Player mPlayer;
 
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private TrackAdapter adapter;
+
     public static Intent newIntent(Context context, String accessToken) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(EXTRA_ACCESS_TOKEN, accessToken);
@@ -50,6 +56,20 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        recyclerView = (RecyclerView) findViewById(R.id.track_list);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        List<TrackSimple> items = new ArrayList<>();
+
+        adapter = new TrackAdapter(items, new TrackAdapter.TrackAdapterListener() {
+            @Override
+            public void onTrackClick(String uri) {
+                mPlayer.play(uri);
+            }
+        });
+        recyclerView.setAdapter(adapter);
 
         String token = getIntent().getStringExtra(EXTRA_ACCESS_TOKEN);
         spotifyApi = new SpotifyApi();
@@ -64,9 +84,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void success(Album album, Response response) {
-                for (TrackSimple track : album.tracks.items) {
-                    Log.d("BLARG", "Title: " + track.name + " URI: " + track.uri);
-                }
+                adapter.setTrackList(album.tracks.items);
             }
         });
 
@@ -76,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements
             public void onInitialized(Player player) {
                 mPlayer.addConnectionStateCallback(MainActivity.this);
                 mPlayer.addPlayerNotificationCallback(MainActivity.this);
-                mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
             }
 
             @Override
