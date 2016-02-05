@@ -3,19 +3,39 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="64dp"
+    android:padding="16dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="?android:attr/selectableItemBackground" >
+
+    <TextView
+        android:id="@+id/track_number"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="#8A000000"
+        tools:text="7"/>
 
     <TextView
         android:id="@+id/track_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:textSize="16sp"
+        android:textColor="#DE000000"
         tools:text="Nothing Ever Happened"/>
 
     <TextView
-        android:id="@+id/track_artist"
-        android:layout_width="wrap_content"
+        android:id="@+id/track_length"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
-        tools:text="Deerhunter"/>
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="#8A000000"
+        tools:text="5:51"/>
 
 </LinearLayout>
