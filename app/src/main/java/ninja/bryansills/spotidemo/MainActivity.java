@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
@@ -17,6 +18,7 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.Spotify;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,13 @@ import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.TrackSimple;
 import retrofit.client.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AlbumArtToolbar {
     
     private static final String TAG = MainActivity.class.getName();
 
     private static final String EXTRA_ACCESS_TOKEN = "EXTRA_ACCESS_TOKEN";
+
+    private ImageView albumArt;
 
     public static Intent newIntent(Context context, String accessToken) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        albumArt = (ImageView) findViewById(R.id.backdrop);
         setSupportActionBar(toolbar);
 
         String token = getIntent().getStringExtra(EXTRA_ACCESS_TOKEN);
@@ -75,5 +80,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void setAlbumArt(String url) {
+        Picasso.with(this).load(url).into(albumArt);
     }
 }

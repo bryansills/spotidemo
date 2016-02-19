@@ -85,6 +85,7 @@ public class AlbumFragment extends Fragment implements
             @Override
             public void success(Album album, Response response) {
                 adapter.setTrackList(album.tracks.items);
+                ((AlbumArtToolbar)getActivity()).setAlbumArt(album.images.get(0).url);
             }
         });
 
